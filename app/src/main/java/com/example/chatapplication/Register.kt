@@ -3,7 +3,6 @@ package com.example.chatapplication
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.widget.Toast
 import com.example.chatapplication.databinding.ActivityRegisterBinding
 import com.google.firebase.auth.FirebaseAuth
@@ -43,7 +42,7 @@ class Register : AppCompatActivity() {
                                     if(task.isSuccessful)
                                     {
                                         Users.document(email).set(user)
-                                        val intent= Intent(this,MainActivity::class.java)
+                                        val intent= Intent(this,ChatActivity::class.java)
                                         intent.putExtra("email",email)
 
                                         startActivity(intent)
@@ -58,7 +57,7 @@ class Register : AppCompatActivity() {
                         else
                         {
                             Toast.makeText(this,"User Already Registered", Toast.LENGTH_LONG).show()
-                            val intent= Intent(this,MainActivity::class.java)
+                            val intent= Intent(this,ChatActivity::class.java)
                             startActivity(intent)
                         }
                     }

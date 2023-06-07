@@ -5,7 +5,6 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Toast
 import com.example.chatapplication.databinding.ActivityLoginBinding
-import com.example.chatapplication.databinding.ActivityRegisterBinding
 import com.google.firebase.auth.FirebaseAuth
 
 class Login : AppCompatActivity() {
@@ -31,7 +30,7 @@ class Login : AppCompatActivity() {
                 auth.signInWithEmailAndPassword(email, password)
                     .addOnCompleteListener(this) { task ->
                         if (task.isSuccessful) {
-                            var intent =Intent(this,MainActivity::class.java)
+                            var intent =Intent(this,ChatActivity::class.java)
                             intent.putExtra("email",email)
                             startActivity(intent)
                             finish()
