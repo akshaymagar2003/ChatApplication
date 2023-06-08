@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">ChatApplication</string>
+    <string name="group_chat">Group Chat</string>
+
 </resources>
