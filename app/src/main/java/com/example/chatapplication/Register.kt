@@ -6,66 +6,59 @@ import android.os.Bundle
 import android.widget.Toast
 import com.example.chatapplication.databinding.ActivityRegisterBinding
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.DatabaseReference
+import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.firestore.FirebaseFirestore
 
 class Register : AppCompatActivity() {
     private lateinit var auth: FirebaseAuth
     lateinit var binding: ActivityRegisterBinding
-    private lateinit var db: FirebaseFirestore
+    private lateinit var db: DatabaseReference
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding= ActivityRegisterBinding.inflate(layoutInflater)
         setContentView(binding.root)
         auth= FirebaseAuth.getInstance()
-        db= FirebaseFirestore.getInstance()
+
         binding.Continue.setOnClickListener {
             if(checking())
             {
                 var email=binding.EmailRegister.text.toString()
                 var password= binding.PasswordRegister.text.toString()
                 var name=binding.Name.text.toString()
+                var uid= auth.currentUser?.uid
                 var phone=binding.Phone.text.toString()
                 val user= hashMapOf(
                     "Name" to name,
+                    "uid" to uid,
                     "Phone" to phone,
                     "email" to email
                 )
-                val Users=db.collection("USERS")
-                val query =Users.whereEqualTo("email",email).get()
-                    .addOnSuccessListener {
-                            tasks->
-                        if(tasks.isEmpty)
-                        {
-                            auth.createUserWithEmailAndPassword(email,password)
-                                .addOnCompleteListener(this){
-                                        task->
-                                    if(task.isSuccessful)
-                                    {
-                                        Users.document(email).set(user)
-                                        val intent= Intent(this,ChatActivity::class.java)
-                                        intent.putExtra("email",email)
+                signUp(name,email,password)
 
-                                        startActivity(intent)
-                                        finish()
-                                    }
-                                    else
-                                    {
-                                        Toast.makeText(this,"Authentication Failed", Toast.LENGTH_LONG).show()
-                                    }
-                                }
-                        }
-                        else
-                        {
-                            Toast.makeText(this,"User Already Registered", Toast.LENGTH_LONG).show()
-                            val intent= Intent(this,ChatActivity::class.java)
-                            startActivity(intent)
-                        }
-                    }
             }
             else{
                 Toast.makeText(this,"Enter the Details", Toast.LENGTH_LONG).show()
             }
         }
+    }
+
+    private fun signUp(name:String,email: String, password: String) {
+          auth.createUserWithEmailAndPassword(email,password).addOnCompleteListener(this){task->
+              if(task.isSuccessful){
+                  auth.currentUser?.uid?.let { addUserToDatabase(name,email, it) }
+
+                val intent =Intent(this@Register,MainActivity::class.java)
+                 startActivity(intent)
+              } else{
+                  Toast.makeText(this@Register,"Some error occured",Toast.LENGTH_SHORT).show()
+              }
+          }
+    }
+
+    private fun addUserToDatabase(name: String, email: String, uid: String) {
+          db=FirebaseDatabase.getInstance().getReference()
+        db.child("user").child(uid).setValue(User(name,email,uid))
     }
 
 
